@@ -16,35 +16,35 @@ function App() {
       setError("Please enter both username and repository name");
       return;
     }
-    
+
     setLoading(true);
     setError("");
     setLoadingStatus("Fetching repository data...");
-    
+
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000);
-      
+
       const res = await fetch(
         `http://localhost:4000/api/graph/${owner}/${repo}?maxCommits=300`,
         { signal: controller.signal }
       );
-      
+
       clearTimeout(timeoutId);
-      
+
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.error || `HTTP ${res.status}: ${res.statusText}`);
       }
-      
+
       setLoadingStatus("Processing graph data...");
       const data = await res.json();
-      
+
       if (data.error) {
         setError(data.error + (data.details ? `: ${data.details}` : ""));
         return;
       }
-      
+
       setGraph(data);
       setMeta(data.meta);
       setVisibleBranches(data.meta.selectedBranches);
@@ -77,11 +77,11 @@ function App() {
       <p style={{ color: "#1e1e1e", marginBottom: 16, fontSize: 16 }}>
         Visualize a repository's history from branches, PRs, and commit patterns.
       </p>
-      
-      <div style={{ 
-        marginBottom: 16, 
-        display: "flex", 
-        gap: 8, 
+
+      <div style={{
+        marginBottom: 16,
+        display: "flex",
+        gap: 8,
         alignItems: "center",
         flexWrap: "wrap"
       }}>
@@ -90,9 +90,9 @@ function App() {
           onChange={(e) => setOwner(e.target.value)}
           onKeyPress={handleKeyPress}
           placeholder="GitHub username"
-          style={{ 
-            padding: "8px 12px", 
-            borderRadius: 20, 
+          style={{
+            padding: "8px 12px",
+            borderRadius: 20,
             border: "1px solid #ddd",
             fontSize: 14,
             fontFamily: 'Quicksand'
@@ -103,16 +103,16 @@ function App() {
           onChange={(e) => setRepo(e.target.value)}
           onKeyPress={handleKeyPress}
           placeholder="Repository name"
-          style={{ 
-            padding: "8px 12px", 
-            borderRadius: 20, 
+          style={{
+            padding: "8px 12px",
+            borderRadius: 20,
             border: "1px solid #ddd",
             fontSize: 14,
             fontFamily: 'Quicksand'
           }}
         />
-        <button 
-          onClick={fetchGraph} 
+        <button
+          onClick={fetchGraph}
           disabled={loading}
           style={{
             padding: "8px 16px",
@@ -136,9 +136,9 @@ function App() {
       </div>
 
       {error && (
-        <div style={{ 
-          padding: 12, 
-          background: "#fff3cd", 
+        <div style={{
+          padding: 12,
+          background: "#fff3cd",
           border: "1px solid #ffc107",
           borderRadius: 20,
           marginBottom: 16,
@@ -150,10 +150,10 @@ function App() {
 
       {meta && (
         <>
-          <div style={{ 
-            marginBottom: 16, 
-            padding: 20, 
-            background: "rgb(217, 217, 217)", 
+          <div style={{
+            marginBottom: 16,
+            padding: 20,
+            background: "rgb(217, 217, 217)",
             borderRadius: 20,
             boxShadow: `
               10px 10px 15px rgba(158, 158, 161, 0.5),
@@ -192,7 +192,7 @@ function App() {
                 const isVisible = visibleBranches.includes(branch);
                 const commitCount = meta.stats?.branchCounts?.[branch] || meta.perBranchCounts[branch] || 0;
                 const isMain = branch === "main" || branch === "master";
-                
+
                 return (
                   <button
                     key={branch}
@@ -219,9 +219,9 @@ function App() {
                   >
                     <span>{isVisible ? "✓" : "○"}</span>
                     <span>{branch}</span>
-                    <span style={{ 
-                      background: "#e1e4e8", 
-                      padding: "2px 6px", 
+                    <span style={{
+                      background: "#e1e4e8",
+                      padding: "2px 6px",
                       borderRadius: 10,
                       fontSize: 11
                     }}>
@@ -236,16 +236,16 @@ function App() {
       )}
 
       {graph ? (
-        <RepoGraph 
-          data={graph} 
-          width={Math.min(window.innerWidth - 64, 1200)} 
-          height={600} 
-          visibleBranches={visibleBranches} 
+        <RepoGraph
+          data={graph}
+          width={Math.min(window.innerWidth - 64, 1200)}
+          height={600}
+          visibleBranches={visibleBranches}
         />
       ) : (
-        <div style={{ 
-          padding: 40, 
-          textAlign: "center", 
+        <div style={{
+          padding: 40,
+          textAlign: "center",
           color: "#949494ff",
           border: "2px dashed #ddd",
           borderRadius: 8,

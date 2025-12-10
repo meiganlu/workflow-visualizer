@@ -191,37 +191,37 @@ export const RepoGraph: React.FC<{
 
     // Create nodes
     const node = g.append("g").attr("class", "nodes")
-  .selectAll("circle")
-  .data(nodes)
-  .join("circle")
-  .attr("r", 20)
-  .attr("fill", (d) => {
-    if (d.isMerge) return "#f56e0f";
-    if (d.branches?.includes(defaultBranch || "")) return "#00b4d8";
-    return "#707070ff";
-  })
-  .attr("stroke", (d) => (d.branches?.includes(defaultBranch || "") ? "#000" : "#666"))
-  .attr("stroke-width", 2)
-  .style("cursor", "pointer");
+      .selectAll("circle")
+      .data(nodes)
+      .join("circle")
+      .attr("r", 20)
+      .attr("fill", (d) => {
+        if (d.isMerge) return "#f56e0f";
+        if (d.branches?.includes(defaultBranch || "")) return "#00b4d8";
+        return "#707070ff";
+      })
+      .attr("stroke", (d) => (d.branches?.includes(defaultBranch || "") ? "#000" : "#666"))
+      .attr("stroke-width", 2)
+      .style("cursor", "pointer");
 
-(node as d3.Selection<SVGCircleElement, NodeDatum, any, any>)
-  .call(
-    d3.drag<SVGCircleElement, NodeDatum>()
-      .on("start", (event: any, d) => {
-        if (!event.active) simulation.alphaTarget(0.3).restart();
-        (d as any).fx = (d as any).x;
-        (d as any).fy = (d as any).y;
-      })
-      .on("drag", (event: any, d) => {
-        (d as any).fx = event.x;
-        (d as any).fy = event.y;
-      })
-      .on("end", (event: any, d) => {
-        if (!event.active) simulation.alphaTarget(0);
-        (d as any).fx = null;
-        (d as any).fy = null;
-      })
-  );
+    (node as d3.Selection<SVGCircleElement, NodeDatum, any, any>)
+      .call(
+        d3.drag<SVGCircleElement, NodeDatum>()
+          .on("start", (event: any, d) => {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            (d as any).fx = (d as any).x;
+            (d as any).fy = (d as any).y;
+          })
+          .on("drag", (event: any, d) => {
+            (d as any).fx = event.x;
+            (d as any).fy = event.y;
+          })
+          .on("end", (event: any, d) => {
+            if (!event.active) simulation.alphaTarget(0);
+            (d as any).fx = null;
+            (d as any).fy = null;
+          })
+      );
 
     const tooltip = d3.select("body")
       .append("div")
@@ -241,7 +241,7 @@ export const RepoGraph: React.FC<{
       tooltip.style("display", "block").html(`
         <div style="font-weight:bold;margin-bottom:4px">${d.id}</div>
         ${d.author ? `<div>⟡ Owner: ${d.author}</div>` : ""}
-        ${d.message ? `<div>⟡ Commit: ${d.message.substring(0,60)}${d.message.length>60?"...":""}</div>` : ""}
+        ${d.message ? `<div>⟡ Commit: ${d.message.substring(0, 60)}${d.message.length > 60 ? "..." : ""}</div>` : ""}
         ${d.branches?.length ? `<div>⟡ Branches: ${d.branches.join(", ")}</div>` : ""}
         ${d.isMerge ? `<div>⟡ Pull request</div>` : ""}
         ${d.date ? `<div>⟡ Date: ${new Date(d.date).toLocaleDateString()}</div>` : ""}
@@ -255,7 +255,7 @@ export const RepoGraph: React.FC<{
       .selectAll("text")
       .data(nodes)
       .join("text")
-      .text(d => d.id.substring(0,8))
+      .text(d => d.id.substring(0, 8))
       .attr("font-size", 10)
       .attr("font-family", "monospace")
       .attr("fill", "#333")

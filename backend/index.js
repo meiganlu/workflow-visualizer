@@ -26,10 +26,10 @@ async function ensureParents(initialCommits, owner, repo, maxFetch = 1000) {
   const seen = new Map(initialCommits.map((c) => [c.sha, c]));
   const queue = [...initialCommits];
   let fetched = 0;
-  
+
   // Batch parent SHAs to check which ones we actually need to fetch
   const missingParents = new Set();
-  
+
   for (const c of initialCommits) {
     if (Array.isArray(c.parents)) {
       for (const p of c.parents) {
@@ -39,12 +39,12 @@ async function ensureParents(initialCommits, owner, repo, maxFetch = 1000) {
       }
     }
   }
-  
+
   console.log(`Found ${missingParents.size} missing parents to fetch`);
-  
+
   // Limit the pool of parents to avoid timeout
   const parentsToFetch = Array.from(missingParents).slice(0, Math.min(maxFetch, 200));
-  
+
   // Fetch missing parents
   const batchSize = 10;
   for (let i = 0; i < parentsToFetch.length; i += batchSize) {
@@ -58,7 +58,7 @@ async function ensureParents(initialCommits, owner, repo, maxFetch = 1000) {
         return null;
       }
     });
-    
+
     const results = await Promise.all(promises);
     results.forEach((commit) => {
       if (commit && !seen.has(commit.sha)) {
@@ -66,10 +66,10 @@ async function ensureParents(initialCommits, owner, repo, maxFetch = 1000) {
         fetched++;
       }
     });
-    
+
     if (fetched >= maxFetch) break;
   }
-  
+
   console.log(`Fetched ${fetched} parent commits`);
   return Array.from(seen.values());
 }
@@ -81,10 +81,10 @@ function buildGraphFromCommits(commits, commitToBranches = new Map()) {
   // Create the nodes
   for (const c of commits) {
     const sha = c.sha;
-    const branches = commitToBranches.has(sha) 
+    const branches = commitToBranches.has(sha)
       ? Array.from(commitToBranches.get(sha))
       : [];
-    
+
     nodesBySha.set(sha, {
       id: sha,
       author: (c.commit?.author?.name) || (c.author?.login) || "",
@@ -100,11 +100,11 @@ function buildGraphFromCommits(commits, commitToBranches = new Map()) {
   for (const c of commits) {
     const childSha = c.sha;
     const childNode = nodesBySha.get(childSha);
-    
+
     if (Array.isArray(c.parents)) {
       for (const p of c.parents) {
         const parentSha = p.sha;
-        
+
         if (!nodesBySha.has(parentSha)) {
           const inheritedBranches = childNode?.branches || [];
           nodesBySha.set(parentSha, {
@@ -117,12 +117,12 @@ function buildGraphFromCommits(commits, commitToBranches = new Map()) {
             childShas: []
           });
         }
-        
+
         const parentNode = nodesBySha.get(parentSha);
         if (!parentNode.childShas.includes(childSha)) {
           parentNode.childShas.push(childSha);
         }
-        
+
         // Links from child to parent
         links.push({ source: childSha, target: parentSha });
       }
@@ -131,25 +131,25 @@ function buildGraphFromCommits(commits, commitToBranches = new Map()) {
 
   // Propagate branch info up the parent chain
   const visited = new Set();
-  
+
   function propagateBranchInfo(sha, branches) {
     if (visited.has(sha) || branches.length === 0) return;
     visited.add(sha);
-    
+
     const node = nodesBySha.get(sha);
     if (!node) return;
-    
+
     const existingBranches = new Set(node.branches || []);
     for (const branch of branches) {
       existingBranches.add(branch);
     }
     node.branches = Array.from(existingBranches);
-    
+
     for (const parentSha of node.parentShas || []) {
       propagateBranchInfo(parentSha, branches);
     }
   }
-  
+
   for (const [sha, node] of nodesBySha) {
     if (node.branches && node.branches.length > 0) {
       propagateBranchInfo(sha, node.branches);
@@ -239,7 +239,7 @@ app.get("/api/graph/:owner/:repo", async (req, res) => {
       perBranchCounts[branchName] = 0;
       let page = 1;
       let branchSawExistingSHA = false;
-      
+
       while (true) {
         if (allCommits.length >= maxCommits) break;
 
@@ -285,7 +285,7 @@ app.get("/api/graph/:owner/:repo", async (req, res) => {
     console.log("Expanding parent chains...");
     const MAX_PARENT_FETCH = 200; // Reduced from 1000 to speed up
     const expandedCommits = await ensureParents(uniqueCommits, owner, repo, MAX_PARENT_FETCH);
-    
+
     console.log("Building graph structure...");
     const graph = buildGraphFromCommits(expandedCommits, commitToBranches);
 
@@ -319,10 +319,10 @@ app.get("/api/graph/:owner/:repo", async (req, res) => {
     return res.json(payload);
   } catch (err) {
     console.error("API Error:", err?.response?.data || err);
-    
+
     let errorMessage = "Failed to fetch graph";
     let details = err?.message;
-    
+
     if (err?.response) {
       const status = err.response.status;
       if (status === 404) {
@@ -339,10 +339,10 @@ app.get("/api/graph/:owner/:repo", async (req, res) => {
       errorMessage = "Request timed out";
       details = "This repository might be too large. Try reducing maxCommits or use a smaller repo.";
     }
-    
-    return res.status(err?.response?.status || 500).json({ 
-      error: errorMessage, 
-      details: details 
+
+    return res.status(err?.response?.status || 500).json({
+      error: errorMessage,
+      details: details
     });
   }
 });
