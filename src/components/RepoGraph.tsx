@@ -39,7 +39,7 @@ export const RepoGraph: React.FC<{
   width?: number;
   height?: number;
   visibleBranches?: string[];
-}> = ({ data, width = 800, height = 400, visibleBranches }) => {
+}> = ({ data, visibleBranches }) => {
 
   console.log("📊 RepoGraph data:", data);
   console.log("📊 Graph nodes:", data?.graph?.nodes?.length);
@@ -47,11 +47,30 @@ export const RepoGraph: React.FC<{
   console.log("📊 Visible branches:", visibleBranches);
 
   const svgRef = useRef<SVGSVGElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [dimensions, setDimensions] = React.useState({ width: 500, height: 600 });
 
   // Extract graph data for useEffect to reference them
   const graph = data?.graph;
   const meta = data?.meta;
   const defaultBranch = meta?.defaultBranch;
+
+  // Handle responsive sizing
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        const width = containerRef.current.offsetWidth;
+        const height = Math.max(500, window.innerHeight * 0.6);
+        setDimensions({ width, height });
+      }
+    };
+
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, []);
+
+  const { width, height } = dimensions;
 
   // Create the graph
   useEffect(() => {
@@ -287,7 +306,7 @@ export const RepoGraph: React.FC<{
   }
 
   return (
-    <div style={{ padding: 8 }}>
+    <div ref={containerRef} style={{ width: "100%", padding: 8 }}>
       <div style={{ fontSize: 14, marginBottom: 14, color: "#1e1e1e" }}>
         Showing {graph.nodes.length} commits, {graph.links.length} connections
       </div>

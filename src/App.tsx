@@ -236,11 +236,9 @@ function App() {
       )}
 
       {graph ? (
-        <RepoGraph
+        <RepoGraph 
           data={graph}
-          width={Math.min(window.innerWidth - 64, 1200)}
-          height={600}
-          visibleBranches={visibleBranches}
+          visibleBranches={visibleBranches} 
         />
       ) : (
         <div style={{

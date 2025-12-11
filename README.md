@@ -39,3 +39,7 @@ npm run dev
 ```
 npm start
 ```
+
+
+## Visual Overview
+![](/images/workflow-visualizer.png)
