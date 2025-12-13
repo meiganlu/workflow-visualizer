@@ -40,17 +40,11 @@ export const RepoGraph: React.FC<{
   height?: number;
   visibleBranches?: string[];
 }> = ({ data, visibleBranches }) => {
-
-  console.log("📊 RepoGraph data:", data);
-  console.log("📊 Graph nodes:", data?.graph?.nodes?.length);
-  console.log("📊 Graph links:", data?.graph?.links?.length);
-  console.log("📊 Visible branches:", visibleBranches);
-
   const svgRef = useRef<SVGSVGElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [dimensions, setDimensions] = React.useState({ width: 500, height: 600 });
 
-  // Extract graph data for useEffect to reference them
+  // Extract graph data for useEffect to reference
   const graph = data?.graph;
   const meta = data?.meta;
   const defaultBranch = meta?.defaultBranch;
@@ -74,19 +68,19 @@ export const RepoGraph: React.FC<{
 
   // Create the graph
   useEffect(() => {
-    // Run early guard inside the effect
+    // Set up guard clause to ensure svgRef and graph data are available
     if (!svgRef.current) return;
-    console.log("RepoGraph received data:", data); // TODO: DELETE LATER
     if (!graph) return;
 
+    // Clear previous graph
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
-    // Local copies
+    // Create shallow copies of the nodes and links
     let nodes = graph.nodes.slice();
     let links = graph.links.slice();
 
-    // Filter by visibleBranches but still include ancestors
+    // Filter nodes and links based on visible branches
     if (visibleBranches && visibleBranches.length > 0) {
       const directlyVisible = new Set(
         graph.nodes
@@ -94,9 +88,11 @@ export const RepoGraph: React.FC<{
           .map((n) => n.id)
       );
 
+      // Include ancestors of directly visible nodes
       const nodesToInclude = new Set(directlyVisible);
       const nodeMap = new Map(graph.nodes.map(n => [n.id, n]));
 
+      // Recursive function to include ancestors (DFS traversal)
       const includeAncestors = (nodeId: string): void => {
         const node = nodeMap.get(nodeId);
         if (!node) return;
@@ -110,6 +106,7 @@ export const RepoGraph: React.FC<{
 
       directlyVisible.forEach(id => includeAncestors(id));
 
+      // Filter to relevant nodes and links
       nodes = graph.nodes.filter(n => nodesToInclude.has(n.id));
       links = graph.links.filter(l => {
         const sourceId = typeof l.source === "string" ? l.source : (l.source as NodeDatum).id;
@@ -127,11 +124,12 @@ export const RepoGraph: React.FC<{
         .on("zoom", (event) => g.attr("transform", event.transform))
     );
 
-    // Form topological layout (parents are lower)
+    // Form topological layers based on distance from leaves
     const nodeMap = new Map(nodes.map(n => [n.id, n]));
     const layers = new Map<string, number>();
     const visited = new Set<string>();
 
+    // Recursive function to determine the layer of each node
     const getLayer = (nodeId: string): number => {
       if (layers.has(nodeId)) return layers.get(nodeId)!;
       if (visited.has(nodeId)) return 0;
@@ -148,10 +146,12 @@ export const RepoGraph: React.FC<{
       return layer;
     };
 
+    // Compute layers for all nodes
     nodes.forEach(n => getLayer(n.id));
     const maxLayer = layers.size ? Math.max(...Array.from(layers.values())) : 0;
     const layerHeight = Math.min(120, height / (maxLayer + 2));
 
+    // Group nodes by its layer
     const nodesByLayer = new Map<number, NodeDatum[]>();
     nodes.forEach(n => {
       const layer = layers.get(n.id) || 0;
@@ -159,7 +159,7 @@ export const RepoGraph: React.FC<{
       nodesByLayer.get(layer)!.push(n);
     });
 
-    // Set node initial positions
+    // Set node initial positions by populating layers
     nodes.forEach(n => {
       const layer = layers.get(n.id) || 0;
       const nodesInLayer = nodesByLayer.get(layer) || [];
@@ -170,6 +170,7 @@ export const RepoGraph: React.FC<{
       n.y = height - 50 - (layer * layerHeight);
     });
 
+    // Initialize force simulation
     const simulation = d3
       .forceSimulation<NodeDatum>(nodes)
       .force(
@@ -185,7 +186,8 @@ export const RepoGraph: React.FC<{
       .force("x", d3.forceX(width / 2).strength(0.02))
       .alpha(0.3)
       .alphaDecay(0.05);
-
+    
+    // Define arrowheads for links
     svg.append("defs").append("marker")
       .attr("id", "arrowhead")
       .attr("viewBox", "0 -5 10 10")
@@ -215,14 +217,15 @@ export const RepoGraph: React.FC<{
       .join("circle")
       .attr("r", 20)
       .attr("fill", (d) => {
-        if (d.isMerge) return "#f56e0f";
-        if (d.branches?.includes(defaultBranch || "")) return "#00b4d8";
+        if (d.isMerge) return "#f56e0f"; // PRs (merge commits) are in orange
+        if (d.branches?.includes(defaultBranch || "")) return "#00b4d8"; // Default branch commits are in blue
         return "#707070ff";
       })
       .attr("stroke", (d) => (d.branches?.includes(defaultBranch || "") ? "#000" : "#666"))
       .attr("stroke-width", 2)
       .style("cursor", "pointer");
 
+    // Enable drag behavior
     (node as d3.Selection<SVGCircleElement, NodeDatum, any, any>)
       .call(
         d3.drag<SVGCircleElement, NodeDatum>()
@@ -241,7 +244,7 @@ export const RepoGraph: React.FC<{
             (d as any).fy = null;
           })
       );
-
+    
     const tooltip = d3.select("body")
       .append("div")
       .attr("class", "rv-tooltip")
@@ -256,6 +259,7 @@ export const RepoGraph: React.FC<{
       .style("z-index", "1000")
       .style("max-width", "300px");
 
+    // Show tooltip on hover
     node.on("mouseover", (event, d) => {
       tooltip.style("display", "block").html(`
         <div style="font-weight:bold;margin-bottom:4px">${d.id}</div>
@@ -269,7 +273,7 @@ export const RepoGraph: React.FC<{
       tooltip.style("left", (event as any).pageX + 15 + "px").style("top", (event as any).pageY + 15 + "px");
     }).on("mouseout", () => tooltip.style("display", "none"));
 
-    // Labels 
+    // Set labels for nodes
     const labels = g.append("g").attr("class", "labels")
       .selectAll("text")
       .data(nodes)
@@ -281,6 +285,7 @@ export const RepoGraph: React.FC<{
       .attr("dx", 24)
       .attr("dy", 4);
 
+    // Update positions on each tick
     simulation.on("tick", () => {
       link
         .attr("x1", (d) => (d.source as NodeDatum).x ?? 0)

@@ -11,6 +11,7 @@ function App() {
   const [error, setError] = useState<string>("");
   const [loadingStatus, setLoadingStatus] = useState<string>("");
 
+  // Fetch graph data from backend
   const fetchGraph = async () => {
     if (!owner || !repo) {
       setError("Please enter both username and repository name");
@@ -22,9 +23,11 @@ function App() {
     setLoadingStatus("Fetching repository data...");
 
     try {
+      // Set a 30s timeout for the fetch request
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000);
 
+      // Use browser's fetch API to call backend endpoint
       const res = await fetch(
         `http://localhost:4000/api/graph/${owner}/${repo}?maxCommits=300`,
         { signal: controller.signal }
@@ -45,6 +48,7 @@ function App() {
         return;
       }
 
+      // Update state with fetched graph data
       setGraph(data);
       setMeta(data.meta);
       setVisibleBranches(data.meta.selectedBranches);
@@ -65,6 +69,7 @@ function App() {
     }
   };
 
+  // Handle Enter key press to trigger fetch
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       fetchGraph();
