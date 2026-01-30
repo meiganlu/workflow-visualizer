@@ -25,11 +25,11 @@ function App() {
     try {
       // Set a 30s timeout for the fetch request
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
+      const timeoutId = setTimeout(() => controller.abort(), 120000);
 
       // Use browser's fetch API to call backend endpoint
       const res = await fetch(
-        `http://localhost:4000/api/graph/${owner}/${repo}?maxCommits=300`,
+        `http://localhost:4000/api/graph/${owner}/${repo}?maxCommits=1500`,
         { signal: controller.signal }
       );
 

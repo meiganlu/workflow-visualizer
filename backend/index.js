@@ -12,7 +12,7 @@ const GITHUB_TOKEN = process.env.GITHUB_TOKEN || "";
 const github = axios.create({
   baseURL: "https://api.github.com",
   headers: GITHUB_TOKEN ? { Authorization: `token ${GITHUB_TOKEN}` } : {},
-  timeout: 30000,
+  timeout: 120000,
 });
 
 // Create cache instance
@@ -368,17 +368,20 @@ app.get("/api/graph/:owner/:repo", async (req, res) => {
 
     const graph = buildGraphFromCommits(expandedCommits, commitToBranches);
 
+    // Filter out placeholder nodes for accurate stats
+    const realNodes = graph.nodes.filter(n => n.message !== "(parent)");
+
     const stats = {
-      totalCommits: graph.nodes.length,
-      pullRequests: graph.nodes.filter(n => n.isMerge).length,
-      splitCommits: graph.nodes.filter(n => n.isSplit).length,
-      authors: [...new Set(graph.nodes.map(n => n.author).filter(Boolean))].length,
+      totalCommits: realNodes.length,
+      pullRequests: realNodes.filter(n => n.isMerge).length,
+      splitCommits: realNodes.filter(n => n.isSplit).length,
+      authors: [...new Set(realNodes.map(n => n.author).filter(Boolean))].length,
       branchCounts: {},
     };
 
     // Count commits per branch in the final graph
     for (const branch of branchTips) {
-      stats.branchCounts[branch] = graph.nodes.filter(n => n.branches?.includes(branch)).length;
+      stats.branchCounts[branch] = realNodes.filter(n => n.branches?.includes(branch)).length;
     }
 
     // Build response payload, send as JSON
