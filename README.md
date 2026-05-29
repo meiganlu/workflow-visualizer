@@ -1,7 +1,5 @@
 # GitHub Workflow Visualizer
 
-This is a tool that visualizes a Git repository history, including branches, PRs, and commit patterns.
-
 GitHub Workflow Visualizer is a tool that transforms public repository commit history into an interactive graph, making it easier to understand development workflows, branch structures, pull request activity, and contributor behavior. Users are able to visualize relationships between commits, identify merge points, and analyze repository evolution.
 
 > [!IMPORTANT]
