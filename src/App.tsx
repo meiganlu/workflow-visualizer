@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import RepoGraph from "./components/RepoGraph";
 
 function App() {
-  const [owner, setOwner] = useState("");
-  const [repo, setRepo] = useState("");
+  const [owner, setOwner] = useState("facebook");
+  const [repo, setRepo] = useState("react");
   const [graph, setGraph] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
   const [meta, setMeta] = useState<any>(null);
@@ -27,9 +27,11 @@ function App() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 120000);
 
+      const API_URL = process.env.REACT_APP_API_URL || "http://localhost:4000";
+
       // Use browser's fetch API to call backend endpoint
       const res = await fetch(
-        `http://localhost:4000/api/graph/${owner}/${repo}?maxCommits=1500`,
+        `${API_URL}/api/graph/${owner}/${repo}?maxCommits=1500`, 
         { signal: controller.signal }
       );
 

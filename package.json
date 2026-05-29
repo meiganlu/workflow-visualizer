@@ -23,7 +23,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "backend": "cd backend && npm start",
+    "dev": "concurrently \"npm run backend\" \"npm start\""
   },
   "eslintConfig": {
     "extends": [
@@ -44,6 +46,7 @@
     ]
   },
   "devDependencies": {
-    "@types/d3": "^7.4.3"
+    "@types/d3": "^7.4.3",
+    "concurrently": "^10.0.0"
   }
 }

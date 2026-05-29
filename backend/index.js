@@ -5,6 +5,13 @@ const NodeCache = require("node-cache");
 const app = express();
 const cors = require("cors");
 app.use(cors());
+app.get("/", (req, res) => {
+  res.json({
+    status: "ok",
+    service: "workflow-visualizer-api"
+  });
+});
+
 const PORT = process.env.PORT || 4000;
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || "";
 
