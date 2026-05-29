@@ -17,7 +17,7 @@ GitHub Workflow Visualizer is a tool that transforms public repository commit hi
 * **Commit Exploration**: Hover over commits to view commit SHA, author, commit message, associated branches, and more
 
 
-## Core Features
+## Tech Stack
 
 ### Frontend
 * React
