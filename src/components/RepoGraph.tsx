@@ -198,14 +198,14 @@ export const RepoGraph: React.FC<{
       .attr("orient", "auto")
       .append("path")
       .attr("d", "M0,-5L10,0L0,5")
-      .attr("fill", "#999");
+      .attr("fill", "rgba(255,255,255,0.25)");
 
     // Create links
     const link = g.append("g").attr("class", "links")
       .selectAll("line")
       .data(links)
       .join("line")
-      .attr("stroke", "#999")
+      .attr("stroke", "rgba(255,255,255,0.25)")
       .attr("stroke-opacity", 0.6)
       .attr("stroke-width", 2)
       .attr("marker-end", "url(#arrowhead)");
@@ -217,11 +217,11 @@ export const RepoGraph: React.FC<{
       .join("circle")
       .attr("r", 20)
       .attr("fill", (d) => {
-        if (d.isMerge) return "#f56e0f"; // PRs (merge commits) are in orange
-        if (d.branches?.includes(defaultBranch || "")) return "#00b4d8"; // Default branch commits are in blue
+        if (d.isMerge) return "#324c67"; // PRs (merge commits) are in dark blue
+        if (d.branches?.includes(defaultBranch || "")) return "#64b0ab"; // Default branch commits are in light blue
         return "#707070ff";
       })
-      .attr("stroke", (d) => (d.branches?.includes(defaultBranch || "") ? "#000" : "#666"))
+      .attr("stroke", (d) => (d.branches?.includes(defaultBranch || "") ? "#b9d4d3" : "#9ca3af"))
       .attr("stroke-width", 2)
       .style("cursor", "pointer");
 
@@ -281,7 +281,7 @@ export const RepoGraph: React.FC<{
       .text(d => d.id.substring(0, 8))
       .attr("font-size", 10)
       .attr("font-family", "monospace")
-      .attr("fill", "#333")
+      .attr("fill", "#9ca3af")
       .attr("dx", 24)
       .attr("dy", 4);
 
@@ -312,7 +312,7 @@ export const RepoGraph: React.FC<{
 
   return (
     <div ref={containerRef} style={{ width: "100%", padding: 8 }}>
-      <div style={{ fontSize: 14, marginBottom: 14, color: "#1e1e1e" }}>
+      <div style={{ fontSize: 14, marginBottom: 14, color: "#ffffff" }}>
         Showing {graph.nodes.length} commits, {graph.links.length} connections
       </div>
       <svg
@@ -320,10 +320,9 @@ export const RepoGraph: React.FC<{
         width={width}
         height={height}
         style={{
-          background: "#fafafa",
+          background: "#121212",
           borderRadius: 20,
-          boxShadow: `10px 10px 15px rgba(198,198,201,0.5), -10px -10px 15px rgba(236,236,236,0.9)`,
-          border: "none",
+          border: "1px solid rgba(255,255,255,0.08)",
         }}
       />
     </div>

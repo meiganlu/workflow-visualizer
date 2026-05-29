@@ -79,9 +79,32 @@ function App() {
   };
 
   return (
-    <div style={{ padding: 16, minHeight: "100vh", width: "80%", margin: "0 10%" }}>
-      <h1 style={{ marginBottom: 8, color: "#1e1e1e" }}>GITHUB WORKFLOW VISUALIZER</h1>
-      <p style={{ color: "#1e1e1e", marginBottom: 16, fontSize: 16 }}>
+    <div
+      style={{
+        padding: 48,
+        minHeight: "100vh",
+        maxWidth: "1400px",
+        margin: "0 auto",
+        color: "white"
+      }}
+    >
+      <h1
+        style={{
+          marginBottom: 8,
+          color: "#ffffff",
+          fontSize: 48,
+          fontWeight: 300,
+          letterSpacing: "-0.03em"
+        }}
+      >GitHub Workflow Visualizer</h1>
+      <p
+        style={{
+          color: "#d3d1d1",
+          marginBottom: 32,
+          fontSize: 18,
+          maxWidth: "700px"
+        }}
+      >
         Visualize a repository's history from branches, PRs, and commit patterns.
       </p>
 
@@ -100,7 +123,9 @@ function App() {
           style={{
             padding: "8px 12px",
             borderRadius: 20,
-            border: "1px solid #ddd",
+            background: "#121212",
+            border: "1px solid rgba(255,255,255,0.08)",
+            color: "#ffffff",
             fontSize: 14,
             fontFamily: 'Quicksand'
           }}
@@ -113,7 +138,9 @@ function App() {
           style={{
             padding: "8px 12px",
             borderRadius: 20,
-            border: "1px solid #ddd",
+            background: "#121212",
+            border: "1px solid rgba(255,255,255,0.08)",
+            color: "#ffffff",
             fontSize: 14,
             fontFamily: 'Quicksand'
           }}
@@ -125,21 +152,35 @@ function App() {
             padding: "8px 16px",
             borderRadius: 20,
             border: "none",
-            background: loading ? "#ccc" : "#949494ff",
+            background: loading
+              ? "#444"
+              : "linear-gradient(135deg, #64b0ab, #324c67)",
             color: "white",
             cursor: loading ? "not-allowed" : "pointer",
             fontSize: 14,
             fontWeight: 500,
-            fontFamily: 'Quicksand'
+            fontFamily: 'Quicksand',
+            boxShadow: loading
+              ? "none"
+              : "0 0 25px rgba(96,165,250,0.25)",
           }}
         >
           {loading ? loadingStatus || "Loading..." : "Create Graph"}
         </button>
-        {loading && (
-          <span style={{ fontSize: 14, color: "#1e1e1e", marginLeft: 8 }}>
-            This may take longer for large repositories...
-          </span>
-        )}
+        <div
+          style={{
+            width: "100%",
+            fontSize: 14,
+            color: "#d3d1d1",
+            marginTop: 8,
+            marginBottom: 30,
+            fontStyle: "italic"
+          }}
+        >
+          Note: Visualizations are generated from the most recent 1,500 commits.
+          Large repositories may display recent development activity rather than
+          their complete history.
+        </div>
       </div>
 
       {error && (
@@ -160,13 +201,12 @@ function App() {
           <div style={{
             marginBottom: 16,
             padding: 20,
-            background: "rgb(217, 217, 217)",
+            background: "#121212",
+            border: "1px solid transparent",
+            backgroundImage: "linear-gradient(#121212,#121212), linear-gradient(135deg,#64b0ab,#324c67)",
+            backgroundOrigin: "border-box",
+            backgroundClip: "padding-box, border-box",
             borderRadius: 20,
-            boxShadow: `
-              10px 10px 15px rgba(158, 158, 161, 0.5),
-              -10px -10px 20px rgba(238, 238, 238, 0.9)
-            `,
-            border: "none"
           }}>
             <h3 style={{ margin: "0 0 1.5% 0", fontSize: 16, fontWeight: 600 }}>
               Repository Statistics
@@ -191,7 +231,14 @@ function App() {
           </div>
 
           <div style={{ marginBottom: 16 }}>
-            <h3 style={{ margin: "2% 0 1% 0", fontSize: 16, fontWeight: 600, color: "#1e1e1e" }}>
+            <h3
+              style={{
+                margin: "2% 0 1% 0",
+                fontSize: 16,
+                fontWeight: 600,
+                color: "#ffffff"
+              }}
+            >
               Filter by Branch
             </h3>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -206,15 +253,31 @@ function App() {
                     style={{
                       padding: "6px 12px",
                       borderRadius: 20,
-                      border: isVisible ? "2px solid #949494ff" : "1px solid #ddd",
-                      background: isVisible ? "#f9fcfeff" : "#fff",
+
+                      border: isVisible
+                        ? "none"
+                        : "1px solid rgba(255,255,255,0.08)",
+
+                      background: isVisible
+                        ? "linear-gradient(135deg, #64b0ab, #324c67)"
+                        : "#121212",
+
+                      color: isVisible
+                        ? "#ffffff"
+                        : "#d1d5db",
+
                       cursor: "pointer",
                       fontSize: 14,
                       fontWeight: isMain ? 600 : 400,
-                      fontFamily: 'Quicksand',
+                      fontFamily: "Quicksand",
+
                       display: "flex",
                       alignItems: "center",
-                      gap: 4
+                      gap: 4,
+
+                      boxShadow: isVisible
+                        ? "0 0 15px rgba(96,165,250,0.25)"
+                        : "none"
                     }}
                     onClick={() => {
                       setVisibleBranches(prev =>
@@ -227,7 +290,8 @@ function App() {
                     <span>{isVisible ? "✓" : "○"}</span>
                     <span>{branch}</span>
                     <span style={{
-                      background: "#e1e4e8",
+                      background: "rgba(255,255,255,0.12)",
+                      color: "#ffffff",
                       padding: "2px 6px",
                       borderRadius: 10,
                       fontSize: 11
@@ -252,9 +316,9 @@ function App() {
           padding: 40,
           textAlign: "center",
           color: "#949494ff",
-          border: "2px dashed #ddd",
+          border: "1px solid #d3d1d1",
           borderRadius: 8,
-          background: "#fafafa"
+          background: "#121212"
         }}>
           <div style={{ fontSize: 16, fontWeight: 500 }}>No repository loaded</div>
           <div style={{ fontSize: 14, marginTop: 8 }}>
