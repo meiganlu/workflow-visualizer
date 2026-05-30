@@ -21,7 +21,7 @@ GitHub Workflow Visualizer is a tool that transforms public repository commit hi
 
 ### Frontend
 * React
-* Typescript
+* TypeScript
 * D3.js
 
 ### Backend
